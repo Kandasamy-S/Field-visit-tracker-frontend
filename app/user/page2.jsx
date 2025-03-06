@@ -12,9 +12,10 @@ export default function UserPage() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Retrieve user from session storage
     const storedUser = sessionStorage.getItem("user");
     if (!storedUser) {
-      router.replace("/");
+      router.replace("/"); // Redirect if no user session
       return;
     }
 
@@ -39,8 +40,8 @@ export default function UserPage() {
   }, []);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("user");
-    router.replace("/");
+    sessionStorage.removeItem("user"); // Clear session
+    router.replace("/"); // Redirect to login
   };
 
   const handleUpload = async (taskId, file) => {
@@ -88,37 +89,26 @@ export default function UserPage() {
     taskStatusFilter === "all" || task.status === taskStatusFilter
   );
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "pending":
-        return "text-red-500";
-      case "in_progress":
-        return "text-yellow-500";
-      case "completed":
-        return "text-green-500";
-      default:
-        return "text-gray-500";
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Navbar */}
-      <nav className="bg-white shadow-md p-4 fixed w-full top-0 flex justify-between items-center z-50">
-        <h2 className="text-xl font-semibold text-gray-700">Welcome, {user.username} 🎉</h2>
-        <button 
-          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
-      </nav>
+    <div className="min-h-screen flex flex-col bg-gray-100 p-4">
+      <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-4xl mx-auto">
+        
+        {/* Welcome Message & Logout Button */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold text-gray-700">
+            Welcome, {user.username} 🎉
+          </h2>
+          <button 
+            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
 
-      {/* Content */}
-      <div className="pt-20 p-4 max-w-5xl mx-auto">
-        {/* Task Filter */}
+        {/* Task Filter Dropdown */}
         <select
-          className="p-2 border border-gray-300 rounded-lg mb-4 w-full sm:w-auto"
+          className="p-2 border border-gray-300 rounded-lg mb-4"
           value={taskStatusFilter}
           onChange={(e) => setTaskStatusFilter(e.target.value)}
         >
@@ -129,19 +119,20 @@ export default function UserPage() {
         </select>
         
         {/* Task Display */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {filteredTasks.map(task => {
             const isDisabled = task.status === "in_progress";
+
             return (
               <div 
                 key={task.id} 
-                className={`p-4 rounded-md shadow-lg bg-white ${isDisabled ? "opacity-50" : ""}`}
+                className={`p-4 rounded-md shadow-lg bg-gray-200 ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 <h3 className="font-semibold">{task.title}</h3>
                 <p className="text-sm">{task.description}</p>
                 <p className="text-sm">Due: {task.due_date}</p>
                 <p className="text-sm">Location: {task.coordinates}</p>
-                <p className={`text-sm font-medium ${getStatusColor(task.status)}`}>Status: {task.status}</p>
+                <p className="text-sm font-medium">Status: {task.status}</p>
                 
                 <input 
                   type="file" 
